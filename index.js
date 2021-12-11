@@ -114,7 +114,7 @@ app.post('/api/persons', (req, res) => {
       error: 'name or number missing' 
     })
   }
-  
+
 	const person = new Person({
 		name: body.name,
 		number: body.number,
@@ -139,6 +139,21 @@ app.delete('/api/persons/:id', (req, res, next) => {
       res.status(204).end()
     })
     .catch(error => next(error))
+})
+
+app.put('/api/persons/:id', (req, res, next) => {
+	const body = req.body
+
+	const person = {
+		name: body.name,
+		number: body.number,
+	}
+
+	Person.findByIdAndUpdate(req.params.id, person, { new: true })
+		.then(updatedPerson => {
+			res.json(updatedPerson)
+		})
+		.catch(error => next(error)) 
 })
 
 const PORT = process.env.PORT
