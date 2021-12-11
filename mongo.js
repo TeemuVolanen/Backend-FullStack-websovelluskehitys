@@ -26,7 +26,7 @@ if (process.argv.length === 3) {
     result.forEach(p => {
       console.log(`${p.name} ${p.number}`)
     })
-  mongoose.connection.close()    
+    mongoose.connection.close()
   })
 } else if (process.argv.length === 4) {
   console.log('give name and number as argument')
@@ -36,7 +36,7 @@ if (process.argv.length === 3) {
     name: process.argv[3],
     number: process.argv[4],
   })
-  p.save().then(response => {
+  p.save().then(() => {
     console.log(`added ${p.name} number ${p.number} to phonebook`)
     mongoose.connection.close()
   })
