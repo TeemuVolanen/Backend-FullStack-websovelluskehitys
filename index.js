@@ -7,6 +7,7 @@ const app2 = express()
 app.use(express.json())
 app2.use(express.json())
 app.use(cors())
+app.use(express.static('build'))
 
 morgan.token('oma', function getBody (req) {
 	if (JSON.stringify(req.body).length > 2) return JSON.stringify(req.body)
