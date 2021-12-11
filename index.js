@@ -106,23 +106,21 @@ app.post('/api/persons', (req, res) => {
   res.json(person)
 })
 */
-app.post('/api/persons', (req, res) => {
+app.post('/api/persons', (req, res, next) => {
 	const body = req.body
   
-  if ((!body.name) || (!body.number)) {
-    return res.status(400).json({ 
-      error: 'name or number missing' 
-    })
-  }
-
 	const person = new Person({
 		name: body.name,
 		number: body.number,
 	})
   
-	person.save().then(savedPerson => {
-	  res.json(savedPerson)
+	person
+		.save()
+		.then(savedPerson => savedPerson.toJSON())
+		.then(savedAndFormattedPerson => {
+			res.json(savedAndFormattedPerson)
 	})
+	.catch(error => next(error))
 })
 
 /*
@@ -161,10 +159,18 @@ app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
 
+/*
 app2.get('/info', (req, res) => {
 	const sum = persons.length
 	const date = new Date()
 	res.send(`<div>Phonebook has info for ${sum} people</div><div>${date}</div>`)
+})
+*/
+app2.get('/info', (req, res) => {
+	Person.count({}, function( err, count){
+		const date = new Date()
+		res.send(`<div>Phonebook has info for ${count} people</div><div>${date}</div>`)
+		})
 })
 
 const PORT2 = 3003
@@ -183,7 +189,9 @@ const errorHandler = (error, req, res, next) => {
 
   if (error.name === 'CastError') {
     return res.status(400).send({ error: 'malformatted id' })
-  }
+  } else if (error.name === 'ValidationError') {
+		return res.status(400).json({ error: error.message })
+	}
 
   next(error)
 }
